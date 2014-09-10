@@ -27,18 +27,51 @@ var configB = require('modular-config').load('/path/to/configC');
 var conf = require('modular-config');
 conf.directory('/var/tmp');
 var configC = conf.load('oddly_placed.toml');
+```
 
+
+## How It Works
+
+This library is structured on the idea that all configurations will be read from disk
+synchronously at application start time.  Most of the time this is an acceptable
+assumption, since many things won't happen until configuration information is
+available.
+
+When a configuration is successfully loaded, it is turned into an object tree, made read-only,
+cached, then returned.  Subsequent requests for the same file will returned the previously
+parsed configuration.  This means that configurations cannot be reloaded without restarting
+the application.
+
+Configuration files may be loaded with an absolute file path or by file name in a lookup
+in a configurable directory (which defaults to `process.cwd() + '/config'`).
+
+All errors throw exceptions.  Though this is a bit extreme, it fits with the use case
+of upfront loading.  If configuration information isn't available, it is assumed that
+either defaults will manually be supplied or that the application cannot reasonably
+start.
+
+Out of the box only TOML (`.toml`) and JSON ('.json', '.js') configuration formats are
+supported.  Other formats may easily be added via the `register()` function.  An
+extension and parser function must be supplied, with the latter returning the parsed
+object (from raw string input).
+
+```
 // Enable YAML config parsing
-var yaml = require('js-yaml');
+var conf = require('modular-config')
+  , yaml = require('js-yaml');
 
-conf.register('yaml', function (path) {
+conf.register('yaml', function (input) {
   try {
-    var data = yaml.safeLoad(fs.readFileSync(path, 'utf8'));
+    return yaml.safeLoad(input);
   } catch (e) {
-    throw new Error('Cannot read configuration file: ' + path);
+    throw new Error('Cannot parse YAML configuration file');
   }
-  return data;
 });
 
 var configd = require('modular-config').load('configD.yaml');
 ```
+
+Existing parsers may be overridden on a per-extension basis.  However, remember that
+the parsing results are cached, so any new parsers _must_ return an object tree.
+Trying to be fancy by returning a Promise (or similar) can result in unexpected
+behavior.

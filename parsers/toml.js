@@ -3,17 +3,14 @@ var fs = require('fs')
   , toml = require('toml');
 
 
-module.exports = function (path) {
-  var src;
-
+module.exports = function (input) {
   try {
-    src = fs.readFileSync(path, { encoding:'utf8' });
+    var data = toml.parse(input);
+    src = null;
+    return data;
   } catch (e) {
-    throw new Error('Cannot read configuration file: ' + path)
+    var ParseError = new Error('Invalid TOML file');
+    ParseError.parseError = e.message;
+    throw ParseError;
   }
-
-  var data = toml.parse(src);
-  src = null;
-
-  return data;
 };

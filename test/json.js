@@ -1,19 +1,28 @@
 
-var test = require('tap').test;
+var test = require('tap').test
+  , fs = require('fs')
+  , dir = process.cwd()
+  , parser = require('../parsers/json');
+
+
+if (dir.indexOf('test') < 0) {
+  dir = dir + '/test';
+}
 
 
 test('json', function (t) {
-  var dir = process.cwd()
-    , parser = require('../parsers/json')
-    , notFound = function () { parser('invalid'); };
+  var data = fs.readFileSync(dir + '/config.json', { encoding:'utf8' })
+    , invalid = function () { parser('invalid'); };
 
-  if (dir.indexOf('test') < 0) {
-    dir = dir + '/test';
-  }
-
-  t.throws(notFound, {
+  t.throws(invalid, {
     name:    'Error',
-    message: 'Cannot read configuration file: invalid'
+    message: 'Invalid JSON file'
+  });
+
+  t.equivalent(parser(data), {
+    'test': {
+      'message':'JSON, reporting in.'
+    }
   });
 
   t.end();

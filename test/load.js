@@ -5,15 +5,21 @@ var test = require('tap').test;
 test('load', function (t) {
   var conf = require('../modular-config')
     , dir  = process.cwd()
-    , wrap = function () { return conf.load('invalid'); };
+    , invalidExtension = function () { return conf.load('invalid'); }
+    , invalidFile = function () { return conf.load(dir + '/invalid.toml'); };
 
   if (dir.indexOf('test') === -1) {
     dir = dir + '/test';
   }
   
-  t.throws(wrap, {
+  t.throws(invalidExtension, {
     name:    'Error',
     message: 'Cannot read configuration: Unsupported file type'
+  });
+
+  t.throws(invalidFile, {
+    name:    'Error',
+    message: 'Cannot read configuration file: ' + dir + '/invalid.toml'
   });
 
   conf.directory = dir;

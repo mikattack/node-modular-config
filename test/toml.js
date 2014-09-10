@@ -1,27 +1,28 @@
 
-var test = require('tap').test;
+var test = require('tap').test
+  , fs = require('fs')
+  , dir = process.cwd()
+  , parser = require('../parsers/toml');
+
+
+if (dir.indexOf('test') < 0) {
+  dir = dir + '/test';
+}
 
 
 test('toml', function (t) {
-  var path = process.cwd()
-    , parser = require('../parsers/toml');
-
-  if (path.indexOf('test') < 0) {
-    path = path + '/test';
-  }
-  path = path + '/invalid.toml';
-  
-  var notFound = function () { parser('invalid'); }
-    , invalid  = function () { parser(path); };
-
-  t.throws(notFound, {
-    name:    'Error',
-    message: 'Cannot read configuration file: invalid'
-  });
+  var data = fs.readFileSync(dir + '/config.toml', { encoding:'utf8' })
+    , invalid = function () { parser('invalid'); };
 
   t.throws(invalid, {
-    name:    'SyntaxError',
-    message: 'Expected "]" but "\\n" found.'
+    name:    'Error',
+    message: 'Invalid TOML file'
+  });
+
+  t.equivalent(parser(data), {
+    'test': {
+      'message':'Comments?  Whitespace?  TOML don\'t care.'
+    }
   });
 
   t.end();

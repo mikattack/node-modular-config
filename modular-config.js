@@ -107,8 +107,13 @@ function load (path, parserName) {
   if (! ext || ! parsers[ext]) {
     throw new Error('Cannot read configuration: Unsupported file type');
   } else {
-    cache[path] = parsers[ext](path);
-    deepfreeze(cache[path]);
+    try {
+      var raw = fs.readFileSync(path, { encoding:'utf8' });
+      cache[path] = parsers[ext](raw);
+      deepfreeze(cache[path]);
+    } catch (e) {
+      throw new Error('Cannot read configuration file: ' + path)
+    }
   }
 
   return cache[path];

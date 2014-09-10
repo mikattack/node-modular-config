@@ -2,14 +2,14 @@
 var fs = require('fs');
 
 
-module.exports = function (path) {
+module.exports = function (input) {
   try {
-    var src = fs.readFileSync(path, { encoding:'utf8' });
+    var data = JSON.parse(input);
+    src = null;
+    return data;
   } catch (e) {
-    throw new Error('Cannot read configuration file: ' + path)
+    var ParseError = new Error('Invalid JSON file');
+    ParseError.parseError = e.message;
+    throw ParseError;
   }
-
-  var data = JSON.parse(src);
-  src = null;
-  return data;
 };

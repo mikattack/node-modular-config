@@ -1,0 +1,29 @@
+{
+  "name": "modular-config",
+  "version": "1.0.0",
+  "description": "Simplistic library for loading configurations from different file formats",
+  "main": "modular-config.js",
+  "dependencies": {
+    "deep-freeze": ">=0.0.1",
+    "toml": ">=2.0.6"
+  },
+  "devDependencies": {
+    "tap": ">=0.4.12"
+  },
+  "scripts": {
+    "test": "tap test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mikattack/node-modular-config.git"
+  },
+  "homepage": "https://github.com/mikattack/node-modular-config",
+  "keywords": [
+    "config",
+    "utility"
+  ],
+  "author": {
+    "name": "Alex Mikitik"
+  },
+  "license": "BSD-2-Clause"
+}

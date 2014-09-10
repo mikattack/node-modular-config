@@ -1,0 +1,2 @@
+[test]
+  message = "Comments?  Whitespace?  TOML don't care."
